@@ -1,15 +1,9 @@
 'use client';
 
-import { PrivyProvider } from '@privy-io/react-auth';
+import {PrivyProvider} from '@privy-io/react-auth';
 
-import * as React from 'react'
-import {
-  ThemeProvider as NextThemesProvider,
-  type ThemeProviderProps,
-} from 'next-themes'
-
-export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
-  return(
+export default function Providers({children}) {
+  return (
     <PrivyProvider
       appId="your-privy-app-id"
       clientId="your-app-client-id"
@@ -26,9 +20,7 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
         }
       }}
     >
-      <NextThemesProvider {...props}>
-        {children}
-      </NextThemesProvider>
+      {children}
     </PrivyProvider>
-  )
+  );
 }
