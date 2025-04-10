@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -21,52 +21,63 @@ const formSchema = z.object({
 })
 
 export default function LoginPage() {
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
   const { toast } = useToast()
-  const { user, authenticated, login, ready } = usePrivy()
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  })
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsLoading(true)
+  // const form = useForm<z.infer<typeof formSchema>>({
+  //   resolver: zodResolver(formSchema),
+  //   defaultValues: {
+  //     email: "",
+  //     password: "",
+  //   },
+  // })
 
-    try {
-      // This is where you would integrate with your authentication service
-      // For example: const response = await signIn(values.email, values.password)
+  const { user, authenticated, login, logout, ready } = usePrivy()
 
-      // Simulate authentication delay
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+  useEffect(() => {
+      if (authenticated) {
+        router.push("/dashboard")
+      } else{
+        setIsLoading(false)
+      }
+    }, [authenticated, router])
 
-      // Show success message
-      toast({
-        title: "Login successful",
-        description: "You have been logged in successfully.",
-      })
 
-      // Redirect to dashboard or home page
-      router.push("/dashboard")
-    } catch (error) {
-      // Show error message
-      toast({
-        title: "Login failed",
-        description: "Please check your credentials and try again.",
-        variant: "destructive",
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  // async function onSubmit(values: z.infer<typeof formSchema>) {
+  //   setIsLoading(true)
 
-  return (
+  //   try {
+  //     // This is where you would integrate with your authentication service
+  //     // For example: const response = await signIn(values.email, values.password)
+
+  //     // Simulate authentication delay
+  //     await new Promise((resolve) => setTimeout(resolve, 1000))
+
+  //     // Show success message
+  //     toast({
+  //       title: "Login successful",
+  //       description: "You have been logged in successfully.",
+  //     })
+
+  //     // Redirect to dashboard or home page
+  //     router.push("/dashboard")
+  //   } catch (error) {
+  //     // Show error message
+  //     toast({
+  //       title: "Login failed",
+  //       description: "Please check your credentials and try again.",
+  //       variant: "destructive",
+  //     })
+  //   } finally {
+  //     setIsLoading(false)
+  //   }
+  // }
+
+  return isLoading ? <h1>Loading...</h1> : (
     <div className="flex min-h-screen items-center justify-center px-4 py-12">
-      {authenticated ? (
+      {/* {authenticated ? (
           <span>
             {" "}
             {user?.wallet?.address?.substring(0, 6)}...
@@ -76,16 +87,15 @@ export default function LoginPage() {
           </span>
         ) : (
           <span />
-        )}
+        )} */}
       <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">Login</CardTitle>
-          <CardDescription>Enter your email and password to access your account</CardDescription>
+        <CardHeader className="space-y-1 text-center">
+          <h1 className="text-2xl font-bold">VOT Election</h1>
+          <p>Connect your wallet to get started</p>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
+            <div className="space-y-4">
+              {/* <FormField
                 control={form.control}
                 name="email"
                 render={({ field }) => (
@@ -103,8 +113,8 @@ export default function LoginPage() {
                     <FormMessage />
                   </FormItem>
                 )}
-              />
-              <FormField
+              /> */}
+              {/* <FormField
                 control={form.control}
                 name="password"
                 render={({ field }) => (
@@ -122,38 +132,16 @@ export default function LoginPage() {
                     <FormMessage />
                   </FormItem>
                 )}
-              />
+              /> */}
               <Button 
               type="submit" 
-              className="w-full" 
-              disabled={isLoading}
-              onClick={() => {login()}}
+              className="w-full"
+              onClick={() => login()}
               >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Logging in...
-                  </>
-                ) : (
-                  "Login"
-                )}
+                Connect Wallet
               </Button>
-            </form>
-          </Form>
+            </div>
         </CardContent>
-        <CardFooter className="flex flex-col space-y-4">
-          <div className="text-sm text-center">
-            <Link href="/auth/forgot-password" className="text-primary hover:underline">
-              Forgot your password?
-            </Link>
-          </div>
-          <div className="text-sm text-center">
-            Don&apos;t have an account?{" "}
-            <Link href="/auth/register" className="text-primary font-medium hover:underline">
-              Sign up
-            </Link>
-          </div>
-        </CardFooter>
       </Card>
     </div>
   )
