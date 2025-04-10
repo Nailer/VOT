@@ -66,6 +66,17 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-12">
+      {authenticated ? (
+          <span>
+            {" "}
+            {user?.wallet?.address?.substring(0, 6)}...
+            {user?.wallet?.address?.substring(user?.wallet?.address?.length - 4)}
+            {user?.email?.address.substring(0, 5)}...
+            {user?.email?.address?.substring(3, 9)}
+          </span>
+        ) : (
+          <span />
+        )}
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold">Login</CardTitle>
