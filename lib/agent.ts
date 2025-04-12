@@ -1,50 +1,102 @@
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { RecallAgentToolkit } from "@recallnet/agent-toolkit/mcp";
-import { Configuration } from "@recallnet/agent-toolkit/shared";
+'use server'
+import {
+  ChatPromptTemplate,
+  HumanMessagePromptTemplate,
+  MessagesPlaceholder,
+  SystemMessagePromptTemplate,
+} from "@langchain/core/prompts";
+import { ChatOpenAI } from "@langchain/openai";
+import { RecallAgentToolkit } from "@recallnet/agent-toolkit/langchain";
 import * as dotenv from "dotenv";
+import { AgentExecutor, createOpenAIFunctionsAgent } from "langchain/agents";
  
 // Load environment variables
 dotenv.config();
  
-// Define permissions for your agent
-const configuration: Configuration = {
-  actions: {
-    account: {
-      read: true,
-      write: true,
+const { RECALL_PRIVATE_KEY, RECALL_NETWORK, OPENAI_API_KEY } = process.env;
+if (!RECALL_PRIVATE_KEY || !OPENAI_API_KEY) {
+  throw new Error(`Missing required environment variables: RECALL_PRIVATE_KEY and OPENAI_API_KEY`);
+}
+ 
+// Initialize the language model
+const llm = new ChatOpenAI({
+  model: "gpt-4o",
+  apiKey: OPENAI_API_KEY,
+  temperature: 0.7,
+});
+ 
+// Create the Recall toolkit with configuration
+console.log('RECALL_PRIVATE_KEY:', process.env.RECALL_PRIVATE_KEY);
+const recallToolkit = new RecallAgentToolkit({
+  privateKey: RECALL_PRIVATE_KEY,
+  configuration: {
+    actions: {
+      account: {
+        read: true,
+        write: true,
+      },
+      bucket: {
+        read: true,
+        write: true,
+      },
     },
-    bucket: {
-      read: true,
-      write: true,
+    context: {
+      network: RECALL_NETWORK || "testnet",
     },
   },
-  context: {},
-};
+});
  
-// Get private key from environment
-const privateKey = process.env.RECALL_PRIVATE_KEY || '';
+// Get LangChain-compatible tools
+const tools = recallToolkit.getTools();
  
-if (!privateKey) {
-  console.error("Missing RECALL_PRIVATE_KEY environment variable");
-  process.exit(1);
-}
+// Create a prompt template for the agent
+const prompt = ChatPromptTemplate.fromMessages([
+  SystemMessagePromptTemplate.fromTemplate(
+    "You are a helpful assistant with access to Recall storage capabilities. " +
+      "1. You can create and manage storage buckets\n" +
+      "2. You can store and retrieve information in buckets\n" +
+      "3. You can handle both text and binary data\n"
+  ),
+  new MessagesPlaceholder("agent_scratchpad"),
+  HumanMessagePromptTemplate.fromTemplate("{input}"),
+]);
+
+// Existing code...
  
 async function main() {
-  // Create the toolkit with your configuration
-  const toolkit = new RecallAgentToolkit({
-    privateKey,
-    configuration,
-  });
+  try {
+    // Create the agent
+    const agent = await createOpenAIFunctionsAgent({
+      llm,
+      tools,
+      prompt,
+    });
  
-  // Use stdin/stdout for MCP communication
-  const transport = new StdioServerTransport();
+    // Create the executor
+    const agentExecutor = new AgentExecutor({
+      agent,
+      tools,
+    });
  
-  // Connect the toolkit to the transport
-  console.error("Starting Recall Agent Toolkit MCP server...");
-  await toolkit.connect(transport);
+    // Define a task for the agent
+    const task =
+      "Create a bucket called 'memories', store a note with the key 'first-memory' and content 'This is my first memory', then retrieve that memory and summarize what you did.";
+ 
+    console.log("Running the agent...");
+    console.log("Task:", task);
+    console.log("---------------------------------------------");
+ 
+    // Run the agent
+    const response = await agentExecutor.invoke({
+      input: task,
+    });
+ 
+    // Display the result
+    console.log("\nAgent response:");
+    console.log(response.output);
+  } catch (error) {
+    console.error("Error running agent:", error);
+  }
 }
  
-main().catch((error) => {
-  console.error("Error:", error);
-  process.exit(1);
-});
+main();
