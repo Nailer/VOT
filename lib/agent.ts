@@ -5,10 +5,12 @@ import {
   MessagesPlaceholder,
   SystemMessagePromptTemplate,
 } from "@langchain/core/prompts";
-import { ChatOpenAI } from "@langchain/openai";
+import { ChatOpenAI, OpenAIEmbeddings } from "@langchain/openai";
 import { RecallAgentToolkit } from "@recallnet/agent-toolkit/langchain";
 import * as dotenv from "dotenv";
 import { AgentExecutor, createOpenAIFunctionsAgent } from "langchain/agents";
+import { ChatGroq } from "@langchain/groq"
+import { MemoryVectorStore } from "langchain/vectorstores/memory";
  
 // Load environment variables
 dotenv.config();
@@ -17,6 +19,24 @@ const { RECALL_PRIVATE_KEY, RECALL_NETWORK, OPENAI_API_KEY } = process.env;
 if (!RECALL_PRIVATE_KEY || !OPENAI_API_KEY) {
   throw new Error(`Missing required environment variables: RECALL_PRIVATE_KEY and OPENAI_API_KEY`);
 }
+
+// for langchain configuration
+const llms = new ChatOpenAI();
+await llms.invoke("Hello, world!");
+
+// for Groq configuration
+const groq = new ChatGroq({     // changed the name from 'llm' to 'groq'
+  model: "llama-3.3-70b-versatile",
+  temperature: 0
+});
+
+// for embedding configuration
+const embeddings = new OpenAIEmbeddings({
+  model: "text-embedding-3-large"
+});
+
+// for vector store configuration
+const vectorStore = new MemoryVectorStore(embeddings);
  
 // Initialize the language model
 const llm = new ChatOpenAI({
