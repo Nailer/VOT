@@ -22,7 +22,10 @@ const cheerioLoader = new CheerioWebBaseLoader(
 
 // for embedding configuration
 const embeddings = new OpenAIEmbeddings({
-  model: "text-embedding-3-large"
+  model: "text-embedding-3-large",
+  openAIApiKey: process.env.OPENAI_API_KEY,
+  maxConcurrency: 1, // Limit concurrent requests
+  maxRetries: 3, // Add automatic retries
 });
 
 
