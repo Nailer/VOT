@@ -11,5 +11,5 @@ This project contains the whole code for VOT project and this utilises Langchain
 *  How we utilised each storage ecosystem with the Langchain AI.
 
 ## You can watch the audio and visual explanation of how VOT works
-<a href="https://youtu.be/YaZZEnK8YTo" target="blank"></a>
+<a href="https://youtu.be/YaZZEnK8YTo" target="_blank">Learn More About VOT</a>
 
