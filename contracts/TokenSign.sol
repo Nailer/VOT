@@ -44,7 +44,7 @@ contract VOT {
         unit256 supply = donation()
 
         for (uint256 i = 0; i <= minElectionCharge; i++) {
-            require(msg.value - _electionAmount, "You need to recharge the minimum of 2FIL");
+            require(msg.value - _electionAmount, "You need to recharge the minimum of 2VOT");
         }
     }
 
