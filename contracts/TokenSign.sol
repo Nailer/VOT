@@ -32,7 +32,7 @@ contract VOT {
 
     // Owner Control
 
-    function changeOwner(address newOwner) public onlyOwner {
+    function changeOwner(address newOwner) public electionOwner {
         owner = newOwner;
     }
 
@@ -41,7 +41,7 @@ contract VOT {
     /**
      * @dev Allows the owner to withdraw the contract's balance, if necessary, because the contract balance is not used.
      */
-    function garbage() public payable onlyOwner {
+    function garbage() public payable electionOwner {
         payable(owner).transfer(address(this).balance);
     }
 
