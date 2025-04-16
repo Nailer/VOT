@@ -25,10 +25,17 @@ contract VOT {
         require(success, "Failed to transfer funds");
     }
 
-        unit256 public minElectionCharge = {msg.value()}
+    unit256 public minElectionCharge = {msg.value()}
+
+    function total()  returns () {
+        
+    }
+
+    unit256 public electionAmount = 2;
 
     // function to charge each election contestants
-    function contestantCharge(address msg.sender) {
+    function contestantCharge(address msg.sender, unit256 _electionAmount) {
+
         require(msg.value < minElectionCharge, "You must have enough balance set by the admin");
 
         if (msg.sender != owner()) {
@@ -37,7 +44,7 @@ contract VOT {
         unit256 supply = donation()
 
         for (uint256 i = 0; i <= minElectionCharge; i++) {
-            
+            require(msg.value - _electionAmount, "You need to recharge the minimum of 2FIL");
         }
     }
 
