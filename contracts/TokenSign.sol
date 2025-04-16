@@ -25,6 +25,22 @@ contract VOT {
         require(success, "Failed to transfer funds");
     }
 
+        unit256 public minElectionCharge = {msg.value()}
+
+    // function to charge each election contestants
+    function contestantCharge(address msg.sender) {
+        require(msg.value < minElectionCharge, "You must have enough balance set by the admin");
+
+        if (msg.sender != owner()) {
+            require(msg.value >= minElectionCharge, "Insufficient balance to join the election");
+        }
+        unit256 supply = donation()
+
+        for (uint256 i = 0; i <= minElectionCharge; i++) {
+            
+        }
+    }
+
     function interact(address bucket) public payable {
         require(msg.value > 0, "You must send > 0 ETH");
         interactions[bucket] += 1;
