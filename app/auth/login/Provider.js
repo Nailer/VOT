@@ -1,6 +1,7 @@
 'use client';
 import React, { use } from 'react';
 import { PrivyProvider } from '@privy-io/react-auth';
+import { filecoin } from 'viem/chains';
 
 export default function Providers({ children }) {
     return (
@@ -17,7 +18,9 @@ export default function Providers({ children }) {
             // Create embedded wallets for users who don't have a wallet
             embeddedWallets: {
                 createOnLogin: 'users-without-wallets'
-            }
+            },
+            defaultChain: filecoin,
+            supportedChains: [filecoin]
             }}
         >
             {children}
